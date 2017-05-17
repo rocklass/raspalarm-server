@@ -1,2 +1,11 @@
 #VM files
 .vagrant
+
+#IDE files
+.idea
+
+#Build tool files
+.gradle
+
+#Generated
+build
