@@ -1,16 +1,24 @@
 buildscript {
     repositories {
+		jcenter()
         mavenCentral()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.3.RELEASE")
+		classpath("com.bmuschko:gradle-docker-plugin:3.0.7")
     }
 }
+
+group = 'rocklass'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'com.bmuschko.docker-remote-api'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 jar {
     baseName = 'raspalarm-server'
@@ -18,14 +26,20 @@ jar {
 }
 
 repositories {
+	jcenter()
     mavenCentral()
 }
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web") 
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }
 
+docker {
+    url = 'tcp://127.0.0.1:4243'
+}
+
+task dockerBuildImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage) {
+    inputDir = project.file('build/docker')
+    tag = 'rocklass/raspalarm-server'
+}
