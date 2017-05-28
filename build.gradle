@@ -1,3 +1,5 @@
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
 buildscript {
     repositories {
 		jcenter()
@@ -31,15 +33,22 @@ repositories {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web") 
+    compile("org.springframework.boot:spring-boot-starter-web")
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }
 
 docker {
-    url = 'tcp://127.0.0.1:4243'
+    //url = 'tcp://192.168.1.25:4243'
+	url = 'tcp://127.0.0.1:4243'
 }
 
-task dockerBuildImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage) {
+task dockerBuildImage(type: DockerBuildImage, dependsOn: ":copyDockerFiles") {
     inputDir = project.file('build/docker')
     tag = 'rocklass/raspalarm-server'
+}
+
+task copyDockerFiles(type: Copy, dependsOn: ":build") {
+    from "src/main/docker"
+	from "build/libs"
+	into "build/docker"
 }
