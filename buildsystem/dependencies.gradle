@@ -1,0 +1,11 @@
+ext {
+    springBootVersion = "1.5.3.RELEASE"
+
+    projectDependencies = [
+            springBootStarterWeb : "org.springframework.boot:spring-boot-starter-web:$springBootVersion",
+    ]
+
+    projectTestDependencies = [
+            springBootStarterTest : "org.springframework.boot:spring-boot-starter-test:$springBootVersion",
+    ]
+}
