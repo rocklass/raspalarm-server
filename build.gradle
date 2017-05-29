@@ -2,53 +2,70 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 buildscript {
     repositories {
-		jcenter()
+        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.3.RELEASE")
-		classpath("com.bmuschko:gradle-docker-plugin:3.0.7")
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.3.RELEASE"
+        classpath "com.bmuschko:gradle-docker-plugin:3.0.7"
     }
 }
 
-group = 'rocklass'
+group = "rocklass"
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'com.bmuschko.docker-remote-api'
+apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "org.springframework.boot"
+apply plugin: "com.bmuschko.docker-remote-api"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+loadConfiguration()
+
 jar {
-    baseName = 'raspalarm-server'
-    version =  '0.1.0'
+    baseName = "raspalarm-server"
+    version = "0.1.0"
 }
 
 repositories {
-	jcenter()
+    jcenter()
     mavenCentral()
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
-    testCompile("org.springframework.boot:spring-boot-starter-test")
+    compile     "org.springframework.boot:spring-boot-starter-web"
+    testCompile "org.springframework.boot:spring-boot-starter-test"
 }
 
 docker {
-    //url = 'tcp://192.168.1.25:4243'
-	url = 'tcp://127.0.0.1:4243'
+    url = project.dockerUrl
 }
 
-task dockerBuildImage(type: DockerBuildImage, dependsOn: ":copyDockerFiles") {
-    inputDir = project.file('build/docker')
-    tag = 'rocklass/raspalarm-server'
+def loadConfiguration() {
+    def environment = hasProperty("env") ? env : "dev"
+
+    Properties properties = new Properties()
+    properties.load(project.file("src/main/profile/" + environment + "/env.properties").newDataInputStream())
+    properties.each { property ->
+        project.ext.set(property.key, property.value)
+    }
 }
 
-task copyDockerFiles(type: Copy, dependsOn: ":build") {
-    from "src/main/docker"
-	from "build/libs"
-	into "build/docker"
+task dockerBuildImage(type: DockerBuildImage, dependsOn: ":processDockerRessources") {
+    inputDir = project.file("build/docker")
+    tag = "rocklass/raspalarm-server"
+}
+
+task processDockerRessources(type: Copy, dependsOn: ":build") {
+    from ("src/main/docker") {
+        filter {
+            it.replaceAll("@dockerContainerFrom@", project.dockerContainerFrom as String)
+        }
+    }
+    from ("build/libs") {
+        include("*.jar")
+    }
+    into "build/docker"
 }

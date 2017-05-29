@@ -1,5 +1,4 @@
-FROM stephank/archlinux:latest
-#FROM stephank/archlinux:arm-latest
+FROM @dockerContainerFrom@
 RUN pacman -Syyu --noconfirm
 RUN pacman -S jre8-openjdk-headless --noconfirm
 ADD raspalarm-server-0.1.0.jar app.jar
