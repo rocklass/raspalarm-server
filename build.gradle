@@ -33,6 +33,8 @@ jar {
 }
 
 dependencies {
+    compile     projectDependencies.fcmJavaCore
+    compile     projectDependencies.fcmJavaClient
     compile     projectDependencies.springBootStarterWeb
     testCompile projectTestDependencies.springBootStarterTest
 }

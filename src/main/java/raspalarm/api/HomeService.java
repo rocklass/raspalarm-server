@@ -10,4 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public interface HomeService {
     @RequestMapping("/")
     String home();
+
+    @RequestMapping("/send")
+    String send();
 }
