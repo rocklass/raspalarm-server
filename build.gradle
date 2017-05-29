@@ -63,7 +63,8 @@ task processDockerRessources(type: Copy, dependsOn: ":build") {
         filter(ReplaceTokens, tokens: [
                 dockerContainerFrom: project.dockerContainerFrom,
                 dockerContainerJarName: jar.baseName,
-                dockerContainerJarVersion: jar.version
+                dockerContainerJarVersion: jar.version,
+                fcmApiKey: project.fcmApiKey
         ])
     }
     from ("build/libs") {

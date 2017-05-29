@@ -2,7 +2,7 @@ package org.rocklass.raspalarm.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.rocklass.raspalarm.api.CloudMessagingService;
+import org.rocklass.raspalarm.messaging.CloudMessagingService;
 import org.rocklass.raspalarm.api.HomeService;
 
 /**

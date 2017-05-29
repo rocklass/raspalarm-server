@@ -1,4 +1,4 @@
-package org.rocklass.raspalarm.api;
+package org.rocklass.raspalarm.messaging;
 
 /**
  * Created by rocklass on 29/05/2017.
