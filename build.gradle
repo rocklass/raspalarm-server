@@ -20,19 +20,14 @@ apply plugin: "idea"
 apply plugin: "org.springframework.boot"
 apply plugin: "com.bmuschko.docker-remote-api"
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 loadConfiguration()
 
 jar {
     baseName = appName
     version = appVersion
-}
-
-repositories {
-    jcenter()
-    mavenCentral()
 }
 
 dependencies {
