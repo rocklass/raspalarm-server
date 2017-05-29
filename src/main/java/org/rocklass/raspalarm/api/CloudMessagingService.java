@@ -1,4 +1,4 @@
-package raspalarm.api;
+package org.rocklass.raspalarm.api;
 
 /**
  * Created by rocklass on 29/05/2017.
