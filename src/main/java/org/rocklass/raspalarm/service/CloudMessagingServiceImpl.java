@@ -3,18 +3,15 @@ package org.rocklass.raspalarm.service;
 import de.bytefish.fcmjava.client.FcmClient;
 import de.bytefish.fcmjava.client.settings.PropertiesBasedSettings;
 import de.bytefish.fcmjava.http.client.IFcmClient;
-import de.bytefish.fcmjava.model.options.FcmMessageOptions;
-import de.bytefish.fcmjava.model.topics.Topic;
-import de.bytefish.fcmjava.requests.topic.TopicUnicastMessage;
-import de.bytefish.fcmjava.responses.TopicMessageResponse;
-import org.rocklass.raspalarm.model.AlertData;
-import org.springframework.stereotype.Component;
+import de.bytefish.fcmjava.responses.FcmMessageResponse;
 import org.rocklass.raspalarm.messaging.CloudMessagingService;
+import org.rocklass.raspalarm.messaging.NotificationFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Duration;
 import java.util.Properties;
 
 /**
@@ -23,6 +20,9 @@ import java.util.Properties;
 @Component
 public class CloudMessagingServiceImpl implements CloudMessagingService {
     private static final String PROPERTIES_FILE_NAME = "fcmjava.properties";
+
+    @Autowired
+    NotificationFactory notificationFactory;
 
     private final Properties properties;
 
@@ -40,12 +40,7 @@ public class CloudMessagingServiceImpl implements CloudMessagingService {
     @Override
     public String sendMessage(String title, String content) {
         try (final IFcmClient client = new FcmClient(PropertiesBasedSettings.createFromProperties(properties))) {
-            final FcmMessageOptions options = FcmMessageOptions.builder()
-                    .setTimeToLive(Duration.ofHours(1))
-                    .build();
-
-            final TopicMessageResponse response = client.send(new TopicUnicastMessage(options, new Topic(title), new AlertData(title, content)));
-
+            final FcmMessageResponse response = client.send(notificationFactory.getNotification(title, content));
             return response.toString();
         } catch (final Exception e) {
             e.printStackTrace();
