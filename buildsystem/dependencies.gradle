@@ -1,11 +1,14 @@
 ext {
     fcmJavaVersion = "2.1"
+    springVersion = "4.3.8.RELEASE"
     springBootVersion = "1.5.3.RELEASE"
 
     projectDependencies = [
-            springBootStarterWeb :  "org.springframework.boot:spring-boot-starter-web:$springBootVersion",
-            fcmJavaCore :           "de.bytefish.fcmjava:fcmjava-core:$fcmJavaVersion",
-            fcmJavaClient :         "de.bytefish.fcmjava:fcmjava-client:$fcmJavaVersion"
+            springBootStarter :         "org.springframework.boot:spring-boot-starter:$springBootVersion",
+            springBootStarterUndertow : "org.springframework.boot:spring-boot-starter-undertow:$springBootVersion",
+            springMvc :                 "org.springframework:spring-webmvc:$springVersion",
+            fcmJavaCore :               "de.bytefish.fcmjava:fcmjava-core:$fcmJavaVersion",
+            fcmJavaClient :             "de.bytefish.fcmjava:fcmjava-client:$fcmJavaVersion"
     ]
 
     projectTestDependencies = [

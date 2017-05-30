@@ -35,7 +35,9 @@ jar {
 dependencies {
     compile     projectDependencies.fcmJavaCore
     compile     projectDependencies.fcmJavaClient
-    compile     projectDependencies.springBootStarterWeb
+    compile     projectDependencies.springBootStarter
+    compile     projectDependencies.springBootStarterUndertow
+    compile     projectDependencies.springMvc
     testCompile projectTestDependencies.springBootStarterTest
 }
 
