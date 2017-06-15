@@ -4,7 +4,7 @@ name=raspalarm
 
 start() {
         ebegin "Starting $name"
-        java -jar /app.jar
+        java -jar /app.jar &
         eend $?
 }
 
