@@ -50,6 +50,7 @@ RUN MYSQL_DATABASE="zm" \
     && cat $tfile \
     && /usr/bin/mysqld --user=mysql --bootstrap --verbose < $tfile \
     && rm -f $tfile \
+    && sed -i 's/\(pdo_mysql.default_socket\).*/pdo_mysql.default_socket=\/run\/mysqld\/mysqld.sock/g' /etc/php5/php.ini \
     && sed -i 's/^;\{0,1\}\(user\) .*/user = lighttpd/g' /etc/php5/php-fpm.conf \
     && sed -i 's/^;\{0,1\}\(group\) .*/group = lighttpd/g' /etc/php5/php-fpm.conf \
     && sed -i 's/^#\(\( \)*include "mod_cgi.conf"\)$/\1/' /etc/lighttpd/lighttpd.conf \
