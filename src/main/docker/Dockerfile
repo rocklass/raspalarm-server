@@ -34,8 +34,8 @@ RUN sed -i 's/#rc_sys=""/rc_sys="lxc"/g' /etc/rc.conf \
 
 # configure zoneminder
 RUN MYSQL_DATABASE="zm" \
-    && MYSQL_USER="zmuser" \
-    && MYSQL_PASSWORD="zmuser" \
+    && MYSQL_USER="@mySqlUser@" \
+    && MYSQL_PASSWORD="@mySqlPassword@" \
     && mkdir -p /run/mysqld \
     && chown -R mysql:mysql /run/mysqld \
     && chown -R mysql:mysql /var/lib/mysql \
@@ -51,6 +51,7 @@ RUN MYSQL_DATABASE="zm" \
     && /usr/bin/mysqld --user=mysql --bootstrap --verbose < $tfile \
     && rm -f $tfile \
     && sed -i 's/\(pdo_mysql.default_socket\).*/pdo_mysql.default_socket=\/run\/mysqld\/mysqld.sock/g' /etc/php5/php.ini \
+    && sed -i 's/\(date.timezone\).*/date.timezone="@phpTimeZone@"/g' /etc/php5/php.ini \
     && sed -i 's/^;\{0,1\}\(user\) .*/user = lighttpd/g' /etc/php5/php-fpm.conf \
     && sed -i 's/^;\{0,1\}\(group\) .*/group = lighttpd/g' /etc/php5/php-fpm.conf \
     && sed -i 's/^#\(\( \)*include "mod_cgi.conf"\)$/\1/' /etc/lighttpd/lighttpd.conf \
@@ -61,8 +62,8 @@ RUN MYSQL_DATABASE="zm" \
     && sed -i 's/\(ZM_DB_TYPE\).*/ZM_DB_TYPE=mysql/g' /etc/zm.conf \
     && sed -i 's/\(ZM_DB_HOST\).*/ZM_DB_HOST=localhost/g' /etc/zm.conf \
     && sed -i 's/\(ZM_DB_NAME\).*/ZM_DB_NAME=zm/g' /etc/zm.conf \
-    && sed -i 's/\(ZM_DB_USER\).*/ZM_DB_USER=zmuser/g' /etc/zm.conf \
-    && sed -i 's/\(ZM_DB_PASS\).*/ZM_DB_PASS=zmuser/g' /etc/zm.conf \
+    && sed -i 's/\(ZM_DB_USER\).*/ZM_DB_USER=@mySqlUser@/g' /etc/zm.conf \
+    && sed -i 's/\(ZM_DB_PASS\).*/ZM_DB_PASS=@mySqlPassword@/g' /etc/zm.conf \
     && sed -i 's/\(ZM_SERVER_HOST\).*/ZM_SERVER_HOST=/g' /etc/zm.conf \
     && chown lighttpd.lighttpd /etc/zm.conf
 

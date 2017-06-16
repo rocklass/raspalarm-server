@@ -66,7 +66,10 @@ task processDockerRessources(type: Copy, dependsOn: ":build") {
                 dockerContainerFrom: project.dockerContainerFrom,
                 dockerContainerJarName: jar.baseName,
                 dockerContainerJarVersion: jar.version,
-                fcmApiKey: project.fcmApiKey
+                fcmApiKey: project.fcmApiKey,
+                mySqlUser: project.mySqlUser,
+                mySqlPassword: project.mySqlPassword,
+                phpTimeZone: project.phpTimeZone
         ])
     }
     from ("build/libs") {
