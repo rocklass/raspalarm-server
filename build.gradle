@@ -42,7 +42,7 @@ dependencies {
 }
 
 docker {
-    url = project.dockerUrl
+    url = project.dockerUrl.replaceAll('@serverIpAddress@', project.serverIpAddress)
 }
 
 def loadConfiguration() {
