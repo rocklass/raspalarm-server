@@ -64,7 +64,8 @@ RUN MYSQL_DATABASE="zm" \
     && sed -i 's/\(ZM_DB_USER\).*/ZM_DB_USER=@mySqlUser@/g' /etc/zm.conf \
     && sed -i 's/\(ZM_DB_PASS\).*/ZM_DB_PASS=@mySqlPassword@/g' /etc/zm.conf \
     && sed -i 's/\(ZM_SERVER_HOST\).*/ZM_SERVER_HOST=/g' /etc/zm.conf \
-    && chown lighttpd.lighttpd /etc/zm.conf
+    && chown lighttpd.lighttpd /etc/zm.conf \
+    && addgroup lighttpd video
 
 # install raspalarm app
 ADD @dockerContainerJarName@-@dockerContainerJarVersion@.jar app.jar
