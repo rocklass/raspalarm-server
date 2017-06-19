@@ -28,4 +28,7 @@ Vagrant.configure($vagrantFileApiVersion) do |config|
 	config.vm.network :forwarded_port, host: 4243, guest: 4243
 	config.vm.network :forwarded_port, host: 8080, guest: 8080
 	config.vm.network :forwarded_port, host: 80, guest: 80
+	config.vm.provider "virtualbox" do |vb|
+        vb.customize ["modifyvm", :id, "--usb", "on"]
+    end
 end
