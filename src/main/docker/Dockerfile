@@ -47,7 +47,6 @@ RUN MYSQL_DATABASE="zm" \
     && echo "CREATE USER $MYSQL_USER@localhost IDENTIFIED BY '$MYSQL_PASSWORD';" >> $tfile \
     && echo "GRANT ALL PRIVILEGES on *.* to $MYSQL_USER@localhost;" >> $tfile \
     && cat /usr/share/zoneminder/db/zm_create.sql >> $tfile \
-    && cat $tfile \
     && /usr/bin/mysqld --user=mysql --bootstrap --verbose < $tfile \
     && rm -f $tfile \
     && sed -i 's/\(pdo_mysql.default_socket\).*/pdo_mysql.default_socket=\/run\/mysqld\/mysqld.sock/g' /etc/php5/php.ini \
@@ -77,7 +76,7 @@ RUN rc-update add lighttpd default \
     && rc-update add mariadb default \
     && rc-update add php-fpm default \
     && rc-update add zoneminder default \
-    && rc-update add raspalarm
+    && rc-update add raspalarm default
 
 VOLUME ["/var/lib/mysql", "/var/cache/zoneminder"]
 
