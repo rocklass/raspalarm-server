@@ -67,17 +67,47 @@ RUN MYSQL_DATABASE="zm" \
     && chown lighttpd.lighttpd /etc/zm.conf \
     && addgroup lighttpd video
 
+RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories \
+    && apk --update --no-cache add motion tor screen openssh \
+    && adduser -S video_surveillance \
+    && addgroup video_surveillance video \
+    && echo "Match user video_surveillance" >> /etc/ssh/sshd_config \
+    && echo "    PermitOpen 127.0.0.1:*" >> /etc/ssh/sshd_config \
+    && mkdir -p /opt/script/motion/ \
+    && echo "videodevice /dev/video0" >> /opt/script/motion/motion.conf \
+    && echo "input -1" >> /opt/script/motion/motion.conf \
+    && echo "start_motion_daemon=no" >> /opt/script/motion/motion.conf \
+    && echo "webcam_localhost off" >> /opt/script/motion/motion.conf \
+    && echo "quiet on" >> /opt/script/motion/motion.conf \
+    && echo "post_capture 0" >> /opt/script/motion/motion.conf \
+    && echo "output_all off" >> /opt/script/motion/motion.conf \
+    && echo "control_localhost off" >> /opt/script/motion/motion.conf \
+    && echo "output_normal off" >> /opt/script/motion/motion.conf \
+    && echo "width 640" >> /opt/script/motion/motion.conf \
+    && echo "height 480" >> /opt/script/motion/motion.conf \
+    && echo "webcam_maxrate 25" >> /opt/script/motion/motion.conf \
+    && echo "ffmpeg_video_codec msmpeg4" >> /opt/script/motion/motion.conf \
+    && echo "stream_localhost off" >> /opt/script/motion/motion.conf \
+    && echo "stream_port 6881" >> /opt/script/motion/motion.conf \
+    && chown root:root -R /opt/script/motion \
+    && sudo chmod 755 -R /opt/script/motion
+
+
+
 # install raspalarm app
 ADD @dockerContainerJarName@-@dockerContainerJarVersion@.jar app.jar
 ADD fcmjava.properties fcmjava.properties
 ADD etc/init.d/raspalarm.sh /etc/init.d/raspalarm
+ADD etc/init.d/screen-motion.sh /etc/init.d/screen-motion
 
 # define start services
 RUN rc-update add lighttpd default \
     && rc-update add mariadb default \
     && rc-update add php-fpm default \
     && rc-update add zoneminder default \
-    && rc-update add raspalarm default
+    && rc-update add raspalarm default \
+    && rc-update add sshd default \
+    && rc-update add screen-motion default
 
 VOLUME ["/var/lib/mysql", "/var/cache/zoneminder"]
 
