@@ -24,8 +24,12 @@ Vagrant.configure($vagrantFileApiVersion) do |config|
 	config.vm.box = "terrywang/archlinux"
 	config.vm.synced_folder ".", "/src"
 	config.vm.provision "shell", inline: $script
+	config.vm.network :forwarded_port, host: 80, guest: 80
 	config.vm.network :forwarded_port, host: 2375, guest: 2375
 	config.vm.network :forwarded_port, host: 4243, guest: 4243
 	config.vm.network :forwarded_port, host: 8080, guest: 8080
-	config.vm.network :forwarded_port, host: 80, guest: 80
+	config.vm.network :forwarded_port, host: 8081, guest: 8081
+	config.vm.provider "virtualbox" do |vb|
+        vb.customize ["modifyvm", :id, "--usb", "on"]
+    end
 end
