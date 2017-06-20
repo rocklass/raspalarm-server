@@ -21,7 +21,7 @@ RUN set -x \
     && [ "$JAVA_HOME" = "$(docker-java-home)" ]
 
 # install packages
-RUN apk --update --no-cache add openrc bash curl zoneminder mysql mysql-client lighttpd php5-fpm php5-pdo php5-pdo_mysql
+RUN apk --update --no-cache add openrc bash curl zoneminder mysql mysql-client lighttpd php5-fpm php5-pdo php5-pdo_mysql php5-cgi php5-ctype
 
 # configure openrc
 RUN sed -i 's/#rc_sys=""/rc_sys="lxc"/g' /etc/rc.conf \
@@ -56,6 +56,7 @@ RUN MYSQL_DATABASE="zm" \
     && sed -i 's/^#\(\( \)*include "mod_cgi.conf"\)$/\1/' /etc/lighttpd/lighttpd.conf \
     && sed -i 's/^#\(\( \)*include "mod_fastcgi_fpm.conf"\)$/\1/' /etc/lighttpd/lighttpd.conf \
     && sed -i '/\( \)*cgi.assign/a "" => "",' /etc/lighttpd/mod_cgi.conf \
+    && sed -i.bak 's/"\/usr\/bin\/php-cgi"/"\/usr\/bin\/php-cgi5"/g' /etc/lighttpd/mod_fastcgi.conf \
     && sed -i 's/\(ZM_WEB_USER\).*/ZM_WEB_USER=lighttpd/g' /etc/zm.conf \
     && sed -i 's/\(ZM_WEB_GROUP\).*/ZM_WEB_GROUP=lighttpd/g' /etc/zm.conf \
     && sed -i 's/\(ZM_DB_TYPE\).*/ZM_DB_TYPE=mysql/g' /etc/zm.conf \
@@ -65,40 +66,21 @@ RUN MYSQL_DATABASE="zm" \
     && sed -i 's/\(ZM_DB_PASS\).*/ZM_DB_PASS=@mySqlPassword@/g' /etc/zm.conf \
     && sed -i 's/\(ZM_SERVER_HOST\).*/ZM_SERVER_HOST=/g' /etc/zm.conf \
     && chown lighttpd.lighttpd /etc/zm.conf \
+    && chown lighttpd.lighttpd /var/log/zoneminder \
     && addgroup lighttpd video
 
+# install and configure motion
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories \
-    && apk --update --no-cache add motion tor screen openssh \
-    && adduser -S video_surveillance \
-    && addgroup video_surveillance video \
-    && echo "Match user video_surveillance" >> /etc/ssh/sshd_config \
-    && echo "    PermitOpen 127.0.0.1:*" >> /etc/ssh/sshd_config \
-    && mkdir -p /opt/script/motion/ \
-    && echo "videodevice /dev/video0" >> /opt/script/motion/motion.conf \
-    && echo "input -1" >> /opt/script/motion/motion.conf \
-    && echo "start_motion_daemon=no" >> /opt/script/motion/motion.conf \
-    && echo "webcam_localhost off" >> /opt/script/motion/motion.conf \
-    && echo "quiet on" >> /opt/script/motion/motion.conf \
-    && echo "post_capture 0" >> /opt/script/motion/motion.conf \
-    && echo "output_all off" >> /opt/script/motion/motion.conf \
-    && echo "control_localhost off" >> /opt/script/motion/motion.conf \
-    && echo "output_normal off" >> /opt/script/motion/motion.conf \
-    && echo "width 640" >> /opt/script/motion/motion.conf \
-    && echo "height 480" >> /opt/script/motion/motion.conf \
-    && echo "webcam_maxrate 25" >> /opt/script/motion/motion.conf \
-    && echo "ffmpeg_video_codec msmpeg4" >> /opt/script/motion/motion.conf \
-    && echo "stream_localhost off" >> /opt/script/motion/motion.conf \
-    && echo "stream_port 6881" >> /opt/script/motion/motion.conf \
-    && chown root:root -R /opt/script/motion \
-    && sudo chmod 755 -R /opt/script/motion
-
-
+    && apk --update --no-cache add motion \
+    && sed -i 's/\(webcam_localhost\).*/webcam_localhost off/g' /etc/motion/motion-dist.conf \
+    && sed -i 's/\(control_localhost\).*/control_localhost off/g' /etc/motion/motion-dist.conf \
+    && sed -i 's/\(webcam_port\).*/webcam_port 8081/g' /etc/motion/motion-dist.conf \
+    && sed -i 's/\(control_port\).*/control_port 8082/g' /etc/motion/motion-dist.conf
 
 # install raspalarm app
 ADD @dockerContainerJarName@-@dockerContainerJarVersion@.jar app.jar
 ADD fcmjava.properties fcmjava.properties
 ADD etc/init.d/raspalarm.sh /etc/init.d/raspalarm
-ADD etc/init.d/screen-motion.sh /etc/init.d/screen-motion
 
 # define start services
 RUN rc-update add lighttpd default \
@@ -106,11 +88,10 @@ RUN rc-update add lighttpd default \
     && rc-update add php-fpm default \
     && rc-update add zoneminder default \
     && rc-update add raspalarm default \
-    && rc-update add sshd default \
-    && rc-update add screen-motion default
+    && rc-update add motion default
 
 VOLUME ["/var/lib/mysql", "/var/cache/zoneminder"]
 
-EXPOSE 80 8080
+EXPOSE 80 8080 8081
 
 CMD ["/sbin/init"]
