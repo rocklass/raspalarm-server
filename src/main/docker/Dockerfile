@@ -14,10 +14,8 @@ RUN { \
     && chmod +x /usr/local/bin/docker-java-home
 ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk/jre
 ENV PATH $PATH:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin
-ENV JAVA_VERSION 8u131
-ENV JAVA_ALPINE_VERSION 8.131.11-r2
 RUN set -x \
-    && apk add --update --no-cache openjdk8-jre="$JAVA_ALPINE_VERSION" \
+    && apk add --update --no-cache openjdk8-jre \
     && [ "$JAVA_HOME" = "$(docker-java-home)" ]
 
 # install packages
@@ -66,16 +64,7 @@ RUN MYSQL_DATABASE="zm" \
     && sed -i 's/\(ZM_DB_PASS\).*/ZM_DB_PASS=@mySqlPassword@/g' /etc/zm.conf \
     && sed -i 's/\(ZM_SERVER_HOST\).*/ZM_SERVER_HOST=/g' /etc/zm.conf \
     && chown lighttpd.lighttpd /etc/zm.conf \
-    && chown lighttpd.lighttpd /var/log/zoneminder \
-    && addgroup lighttpd video
-
-# install and configure motion
-RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories \
-    && apk --update --no-cache add motion \
-    && sed -i 's/\(webcam_localhost\).*/webcam_localhost off/g' /etc/motion/motion-dist.conf \
-    && sed -i 's/\(control_localhost\).*/control_localhost off/g' /etc/motion/motion-dist.conf \
-    && sed -i 's/\(webcam_port\).*/webcam_port 8081/g' /etc/motion/motion-dist.conf \
-    && sed -i 's/\(control_port\).*/control_port 8082/g' /etc/motion/motion-dist.conf
+    && chown lighttpd.lighttpd /var/log/zoneminder
 
 # install raspalarm app
 ADD @dockerContainerJarName@-@dockerContainerJarVersion@.jar app.jar
@@ -87,11 +76,10 @@ RUN rc-update add lighttpd default \
     && rc-update add mariadb default \
     && rc-update add php-fpm default \
     && rc-update add zoneminder default \
-    && rc-update add raspalarm default \
-    && rc-update add motion default
+    && rc-update add raspalarm default
 
 VOLUME ["/var/lib/mysql", "/var/cache/zoneminder"]
 
-EXPOSE 80 8080 8081
+EXPOSE 80 8080
 
 CMD ["/sbin/init"]
