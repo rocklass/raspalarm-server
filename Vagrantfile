@@ -6,6 +6,7 @@ echo "Installing Docker"
 sudo pacman -S docker --noconfirm
 echo "Configuring Docker"
 sudo usermod -aG docker vagrant
+sudo usermod -aG video vagrant
 sudo systemctl enable docker
 sudo mkdir -p /etc/systemd/system/docker.service.d
 sudo cat > /etc/systemd/system/docker.service.d/override.conf <<EOF
