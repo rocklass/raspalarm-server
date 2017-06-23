@@ -71,12 +71,14 @@ ADD @dockerContainerJarName@-@dockerContainerJarVersion@.jar app.jar
 ADD fcmjava.properties fcmjava.properties
 ADD etc/init.d/raspalarm.sh /etc/init.d/raspalarm
 
-# define start services
-RUN rc-update add lighttpd default \
-    && rc-update add mariadb default \
-    && rc-update add php-fpm default \
-    && rc-update add zoneminder default \
-    && rc-update add raspalarm default
+# define start service
+RUN rc-update add raspalarm default
+
+# create user raspalarm
+RUN adduser -D -H raspalarm \
+    && echo "raspalarm ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
+    && chown raspalarm.raspalarm /run
+USER raspalarm
 
 VOLUME ["/var/lib/mysql", "/var/cache/zoneminder"]
 
